@@ -1,0 +1,44 @@
+# LiteSpeed & CloudLinux Execution Anti-Timeout Rules
+<IfModule Litespeed>
+  RewriteEngine On
+  RewriteRule .* - [E=noconntimeout:1]
+  RewriteRule .* - [E=noabort:1]
+</IfModule>
+
+# SponsorGraph cPanel Routing and Optimization
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Allow direct access to PHP API scripts
+  RewriteRule ^api/ - [L]
+  
+  # Serve static files if they exist
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Route everything else to React SPA index.html
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Security Headers & CORS
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Access-Control-Allow-Origin "*"
+  Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, X-Qloo-Key, X-Gemini-Key"
+  Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+</IfModule>
+
+# Protect sensitive environment files
+<FilesMatch "^\.env">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Enable compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json
+</IfModule>
